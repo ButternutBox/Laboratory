@@ -121,16 +121,6 @@ RSpec.describe Laboratory::Experiment do
       expect(described_class.find(experiment.id)).to_not eq nil
     end
 
-    it 'writes to the changelog' do
-      experiment = described_class.create(id: 1, variants: [{ id: 'control', percentage: 100 }])
-      fetched_experiment = described_class.find(experiment.id)
-
-      expect(fetched_experiment.changelog.count).to eq(1)
-
-      changelog_item = fetched_experiment.changelog.first
-      expect(changelog_item.action).to eq(:create)
-    end
-
     context 'when the variants are passed in in the correct format' do
       it 'converts them into Experiment::Variant objects' do
         variants = [
@@ -256,42 +246,6 @@ RSpec.describe Laboratory::Experiment do
         experiment = described_class.find_or_create(id: id, variants: variants)
         expect(described_class.find(id)).not_to eq(nil)
       end
-    end
-  end
-
-  describe '#update' do
-    it 'writes the experiment to the storage adapter' do
-      id = 1
-      variants = [
-        {
-          id: 'control',
-          percentage: 40
-        },
-        {
-          id: 'variant_a',
-          percentage: 60
-        }
-      ]
-
-      experiment = described_class.create(id: id, variants: variants)
-
-      experiment.update(id: 2)
-
-      fetched_experiment = described_class.find(2)
-      fetched_old_experiment = described_class.find(id)
-
-      expect(fetched_old_experiment).to eq(nil)
-      expect(fetched_experiment).not_to eq(nil)
-    end
-
-    it 'writes to the changelog' do
-      experiment = described_class.create(id: 1, variants: [{ id: 'control', percentage: 100 }])
-
-      experiment.update(id: 2)
-
-      expect { experiment.update(id: 2) }
-        .to change { described_class.find(experiment.id).changelog.count }
-        .by(1)
     end
   end
 
@@ -444,7 +398,7 @@ RSpec.describe Laboratory::Experiment do
     end
   end
 
-  describe '#write!' do
+  describe '#save' do
     it 'calls the adapter#write method' do
       id = 1
       variants = [
@@ -460,7 +414,7 @@ RSpec.describe Laboratory::Experiment do
 
       experiment = described_class.new(id: id, variants: variants)
       expect(Laboratory.config.adapter).to receive(:write).with(experiment)
-      experiment.write!
+      experiment.save
     end
   end
 

@@ -7,7 +7,13 @@ module Laboratory
     class InvalidExperimentVariantFormatError < StandardError; end
     class IncorrectPercentageTotalError < StandardError; end
 
-    attr_reader :id, :variants, :algorithm, :changelog
+    attr_accessor :id, :algorithm
+    attr_reader(
+      :_original_id,
+      :_original_algorithm,
+      :variants,
+      :changelog
+    )
 
     def initialize(id:, variants:, algorithm: Algorithms::Random, changelog: [])
       @id = id
@@ -30,6 +36,9 @@ module Laboratory
             )
           end
         end
+
+      @_original_id = id
+      @_original_algorithm = algorithm
     end
 
     def self.all
@@ -39,21 +48,13 @@ module Laboratory
     def self.create(id:, variants:, algorithm: Algorithms::Random)
       raise ClashingExperimentIdError if find(id)
 
-      changelog_item = Laboratory::Experiment::ChangelogItem.new(
-        action: :create,
-        changes: [],
-        timestamp: Time.now,
-        actor: Laboratory::Config.actor
-      )
-
       experiment = Experiment.new(
         id: id,
         variants: variants,
-        algorithm: algorithm,
-        changelog: [changelog_item]
+        algorithm: algorithm
       )
 
-      experiment.write!
+      experiment.save
       experiment
     end
 
@@ -63,57 +64,6 @@ module Laboratory
 
     def self.find_or_create(id:, variants:, algorithm: Algorithms::Random)
       find(id) || create(id: id, variants: variants, algorithm: algorithm)
-    end
-
-    def update(attrs)
-      # delete previous key if valid? passes below.
-      old_id = id
-
-      # Diff changes
-
-      current_hash = {
-        id: id,
-        variants: variants.map { |variant|
-          {
-            id: variant.id,
-            percentage: variant.percentage
-          }
-        },
-        algorithm: algorithm
-      }
-
-      updated_variants_subhash = attrs[:variants]&.map do |variant|
-        {
-          id: variant[:id],
-          percentage: variant[:percentage]
-        }
-      end
-
-      updated_hash = {
-        id: attrs[:id] || id,
-        variants: updated_variants_subhash || current_hash[:variants],
-        algorithm: attrs[:algorithm] || algorithm
-      }
-
-      changes = current_hash.to_a - updated_hash.to_a
-      @id = attrs[:id] if !attrs[:id].nil?
-      @variants = attrs[:variants] if !attrs[:variants].nil?
-      @algorithm = attrs[:algorithm] if !attrs[:algorithm].nil?
-
-      raise errors.first unless valid?
-
-      changelog_item = Laboratory::Experiment::ChangelogItem.new(
-        action: :update,
-        changes: changes,
-        timestamp: Time.now,
-        actor: Laboratory.config.actor
-      )
-
-      @changelog << changelog_item
-
-      Laboratory.config.adapter.delete(old_id)
-      write!
-      self
     end
 
     def delete
@@ -130,7 +80,7 @@ module Laboratory
 
       Laboratory::Config.on_assignment_to_variant&.call(self, variant, user)
 
-      write!
+      save
       variant
     end
 
@@ -144,7 +94,7 @@ module Laboratory
 
       Laboratory::Config.on_assignment_to_variant&.call(self, variant, user)
 
-      write!
+      save
       variant
     end
 
@@ -154,7 +104,7 @@ module Laboratory
 
       maybe_event = variant.events.find { |event| event.id == event_id }
       event =
-        if maybe_event != nil
+        if !maybe_event.nil?
           maybe_event
         else
           e = Event.new(id: event_id)
@@ -167,12 +117,21 @@ module Laboratory
 
       Laboratory::Config.on_event_recorded&.call(self, variant, user, event)
 
-      write!
+      save
       event_recording
     end
 
-    def write!
+    def save
       raise errors.first unless valid?
+      unless changeset.empty?
+        changelog_item = Laboratory::Experiment::ChangelogItem.new(
+          changes: changeset,
+          timestamp: Time.now,
+          actor: Laboratory::Config.actor
+        )
+
+        @changelog << changelog_item
+      end
       Laboratory.config.adapter.write(self)
     end
 
@@ -186,6 +145,21 @@ module Laboratory
         variants.map(&:percentage).sum == 100
 
       !id.nil? && !algorithm.nil? && valid_variants && valid_percentage_amounts
+    end
+
+    private
+
+    def changeset
+      set = {}
+      set[:id] = [_original_id, id] if _original_id != id
+      set[:algorithm] = [_original_algorithm, algorithm] if _original_algorithm != algorithm
+
+      variants_changeset = variants.map { |variant|
+        { variant.id => variant.changeset }
+      }.compact
+
+      set[:variants] = variants_changeset if !variants_changeset.empty?
+      set
     end
 
     def errors

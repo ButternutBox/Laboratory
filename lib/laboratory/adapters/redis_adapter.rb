@@ -15,7 +15,6 @@ module Laboratory
 
       def write(experiment)
         redis.set(redis_key(experiment_id: experiment.id), experiment_to_json(experiment))
-
         # Write to ALL_EXPERIMENTS_KEY_KEY if it isn't already there.
         experiment_ids = JSON.parse(redis.get(ALL_EXPERIMENTS_KEYS_KEY))
         experiment_ids << experiment.id unless experiment_ids.include?(experiment.id)
@@ -119,10 +118,9 @@ module Laboratory
       def parse_json_to_experiment_changelog_items(changelog_json)
         changelog_json.map do |json|
           Experiment::ChangelogItem.new(
-            action: json[:action],
-            changes: json[:changes],
-            timestamp: json[:timestamp],
-            actor: json[:actor]
+            changes: json['changes'],
+            timestamp: json['timestamp'],
+            actor: json['actor']
           )
         end
       end

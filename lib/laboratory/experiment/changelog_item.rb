@@ -1,10 +1,9 @@
 module Laboratory
   class Experiment
     class ChangelogItem
-      attr_reader :action, :changes, :timestamp, :actor
+      attr_reader :changes, :timestamp, :actor
 
-      def initialize(action:, changes: [], timestamp:, actor:)
-        @action = action
+      def initialize(changes:, timestamp:, actor:)
         @changes = changes
         @timestamp = timestamp
         @actor = actor

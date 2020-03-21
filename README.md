@@ -210,18 +210,13 @@ Note: This would wipe all users from the experiment.
 
 ```ruby
 experiment = Laboratory::Experiment.find('blue_button_cta')
-variants = [
-  {
-    id: 'control',
-    percentage: 40
-  },
-  {
-    id: 'variant_a',
-    percentage: 60
-  }
-]
+control = experiment.variants.find { |variant| variant.id == 'control' }
+variant_a = experiment.variants.find { |variant| variant.id == 'variant_a' }
 
-experiment.update(variants: new_variants)
+control.percentage = 30
+variant_a.percentage = 70
+
+experiment.save
 ```
 
 **Finding the current user**:
