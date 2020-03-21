@@ -257,6 +257,30 @@ RSpec.describe Laboratory::Experiment do
     end
   end
 
+  describe '#reset' do
+    it 'resets the participant_ids for all variants' do
+      experiment = described_class.create(id: 1, variants: [{ id: 'control', percentage: 100 }])
+      user = Laboratory::User.new(id: 1)
+      experiment.assign_to_variant(experiment.variants.first.id, user: user)
+
+      experiment.reset
+
+      expect(experiment.variants.first.participant_ids.count).to be 0
+    end
+
+    it 'resets the events for all variants' do
+      experiment = described_class.create(id: 1, variants: [{ id: 'control', percentage: 100 }])
+      user = Laboratory::User.new(id: 1)
+      experiment.assign_to_variant(experiment.variants.first.id, user: user)
+
+      experiment.record_event!('completed', user: user)
+
+      experiment.reset
+
+      expect(experiment.variants.first.events.count).to be 0
+    end
+  end
+
   describe '#variant' do
     context 'when the user is already assigned to a variant' do
       it 'returns that variant' do

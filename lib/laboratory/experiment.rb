@@ -71,6 +71,18 @@ module Laboratory
       nil
     end
 
+    def reset
+      @variants = variants.map do |variant|
+        Variant.new(
+          id: variant.id,
+          percentage: variant.percentage,
+          participant_ids: [],
+          events: []
+        )
+      end
+      save
+    end
+
     def variant(user: Laboratory.config.current_user)
       selected_variant = variants.find { |variant| variant.participant_ids.include?(user.id)}
       return selected_variant if !selected_variant.nil?
