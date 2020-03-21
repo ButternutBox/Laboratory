@@ -13,6 +13,18 @@ Laboratory is an A/B testing and Feature Flag framework for Rails. It's focused 
 
 Laboratory builds upon great work from other gems, in particular [Split](https://github.com/splitrb/split).
 
+Laboratory is in active development, see the bottom for a todo list.
+
+## Preview of UI Interface
+
+### Viewing and Analysing experiments
+
+![ui-interface](https://imgur.com/l23iiet.png)
+
+### Editting an experiment
+
+![edit-ui-interface](https://imgur.com/O6JkDk0.png)
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -208,8 +220,6 @@ user.variant_for_experiment(experiment) # Note: This returns nil if the user is 
 
 **Updating an experiment's variants**:
 
-Note: This would wipe all users from the experiment.
-
 ```ruby
 experiment = Laboratory::Experiment.find('blue_button_cta')
 control = experiment.variants.find { |variant| variant.id == 'control' }
@@ -251,6 +261,16 @@ Any algorithm just needs to respond to a `#pick!(variants)` and a `#id` method, 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+
+### Todo List
+
+- [ ] Redefine the Experiment#inspect definition for cleaner debugging
+- [ ] Install Rubocop
+- [ ] Fixup to comply with Rubocop
+- [ ] Enforce parameter friendly experiment names
+- [ ] Enable assignment of variant temporarily via url
+- [ ] Test in a multi-threaded puma environment
+- [ ] Review dependencies and minimum versions required.
 
 ## Contributing
 
