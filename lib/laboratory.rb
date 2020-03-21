@@ -10,6 +10,9 @@ require 'laboratory/experiment/variant'
 require 'laboratory/experiment/changelog_item'
 require 'laboratory/experiment/event'
 require 'laboratory/experiment/event/recording'
+require 'laboratory/experiment/analysis_summary'
+require 'laboratory/calculations/z_score'
+require 'laboratory/calculations/confidence_level'
 
 module Laboratory
   class << self

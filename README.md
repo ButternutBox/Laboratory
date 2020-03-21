@@ -11,6 +11,8 @@ Laboratory is an A/B testing and Feature Flag framework for Rails. It's focused 
 * Simplicity, while not being simplisitic
   * Laboratory comes with a single A/B test algorithm and single storage adapter built-in, which we think will cover 99% of use cases for A/B testing and Feature Flagging. If you're in that 1%, it's easy to extend Laboratory to add custom Algorithms and Storage mechanisms.
 
+Laboratory builds upon great work from other gems, in particular [Split](https://github.com/splitrb/split).
+
 ## Installation
 
 Add this line to your application's Gemfile:

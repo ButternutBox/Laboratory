@@ -133,6 +133,10 @@ module Laboratory
       event_recording
     end
 
+    def analysis_summary_for(event_id)
+      Experiment::AnalysisSummary.new(self, event_id)
+    end
+
     def save
       raise errors.first unless valid?
       unless changeset.empty?
@@ -168,9 +172,12 @@ module Laboratory
 
       variants_changeset = variants.map { |variant|
         { variant.id => variant.changeset }
-      }.compact
+      }
+      variants_changeset.reject! do |change|
+        change.values.all?(&:empty?)
+      end
 
-      set[:variants] = variants_changeset if !variants_changeset.empty?
+      set[:variants] = variants_changeset unless variants_changeset.empty?
       set
     end
 
