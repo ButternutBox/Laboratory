@@ -1,0 +1,102 @@
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Verdana';
+  background-color: #EEEEEE;
+  color: #383B66;
+  line-height: 2rem;
+}
+
+h1 {
+  font-weight: bold;
+  font-size: 4rem;
+}
+
+h3 {
+  font-weight: bold;
+  font-size: 2rem;
+}
+
+h5 {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.main {
+  min-height: 100%;
+  margin: 0 auto -30px;
+}
+
+.content {
+  padding: 40px;
+}
+
+.footer {
+  height: 30px;
+  padding-left: 40px;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.experiment {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  border: 0.1rem dashed #DDDDDD;
+  border-radius: 1rem;
+}
+
+.experiment-title {
+}
+
+.experiment-sections {
+  margin-top: 1rem;
+}
+
+.experiment-section:not(:last-child) {
+  margin-bottom: 1rem;
+}
+
+.experiment-section-title {
+  margin-bottom: 1rem;
+}
+
+.experiment-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.experiment .row {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 0.5rem;
+}
+
+.experiment .row.header {
+  padding-bottom: 0.3rem;
+  border-bottom: 0.05rem solid #CCCCCC
+}
+
+.experiment .row .column {
+  flex: 1;
+}
+
+.experiment .row .column:not(:last-child) {
+  flex-basis: 15rem;
+  flex-grow: 0;
+}
+
+.user-id-input-form {
+
+}
+
+.user-id-input-form label {
+  display: block
+}
+
+

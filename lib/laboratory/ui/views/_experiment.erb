@@ -1,0 +1,86 @@
+<% all_experiment_event_ids = experiment.variants.flat_map(&:events).map(&:id).uniq %>
+
+<div class="experiment">
+  <h3 class='experiment-title'>Experiment: <%= experiment.id %></h3>
+  <div class='experiment-sections'>
+    <div class='experiment-section'>
+      <h5 class='experiment-section-title'>Summary</h5>
+      <div class='experiment-table'>
+        <div class="row header">
+          <div class='column'>
+            Variant
+          </div>
+          <div class='column'>
+            Percentage
+          </div>
+          <div class='column'>
+            Number of participants
+          </div>
+        </div>
+        <% experiment.variants.each do |variant| %>
+          <div class="row">
+            <div class='column'>
+              <%= variant.id %>
+            </div>
+            <div class='column'>
+              <%= variant.percentage %>%
+            </div>
+            <div class='column'>
+              <%= variant.participant_ids.count %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <% all_experiment_event_ids.each do |event_id| %>
+      <div class='experiment-section'>
+        <h5 class='experiment-section-title'>Event: <%= event_id %></h5>
+        <p><%= analysis_summary(experiment, event_id) %>
+        <div class='experiment-table'>
+          <div class="row header">
+            <div class='column'>
+              Variant
+            </div>
+            <div class='column'>
+              Number of participants
+            </div>
+            <div class="column">
+              Number of event instances
+            </div>
+            <div class='column'>
+              Conversion Rate
+            </div>
+          </div>
+          <% experiment.variants.each do |variant| %>
+            <div class="row">
+              <div class='column'>
+                <%= variant.id %>
+              </div>
+              <div class='column'>
+                <%= variant.participant_ids.count %>
+              </div>
+              <% if variant.events.map(&:id).include?(event_id) %>
+                <% event = variant.events.find { |event| event.id == event_id } %>
+                <div class="column">
+                  <%= event.event_recordings.count %>
+                </div>
+                <div class="column">
+                  <%= ((event.event_recordings.count.fdiv(variant.participant_ids.count)) * 100).round(2) %>%
+                </div>
+              <% else %>
+                <div class='column'>
+                  0
+                </div>
+                <div class='column'>
+                  N/A
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <a href="<%= experiment_url(experiment) %>">Edit Experiment</a>
+</div>

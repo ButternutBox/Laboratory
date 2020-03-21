@@ -1,0 +1,61 @@
+<div class="experiment">
+  <h3 class='experiment-title'>Experiment: <%= @experiment.id %></h3>
+  <div class='experiment-sections'>
+    <div class='experiment-section'>
+      <h5 class='experiment-section-title'>Proportions</h5>
+      <div class='experiment-table'>
+        <div class="row header">
+          <div class='column'>
+            Variant
+          </div>
+          <div class='column'>
+            Percentage
+          </div>
+        </div>
+        <form method='post' action="<%= update_percentages_url(@experiment) %>">
+          <% @experiment.variants.each do |variant| %>
+            <div class="row">
+              <div class='column'>
+                <%= variant.id %>
+              </div>
+              <div class='column'>
+                <input name="variants[<%= variant.id %>]" type="number" placeholder="percentage" value="<%= variant.percentage %>" />
+              </div>
+            </div>
+          <% end %>
+          <input type="submit" value='Save' />
+        </form>
+      </div>
+    </div>
+
+    <div class='experiment-section'>
+      <h5 class='experiment-section-title'>Assign users to variant</h5>
+      <form class='user-id-input-form' method='post' action="<%= assign_users_to_variant_url(@experiment) %>">
+        <div class='input-group'>
+          <label for='variant'>Variant:</label>
+          <select name='variant_id' id='variant'>
+            <% @experiment.variants.each do |variant| %>
+              <option value="<%= variant.id %>"><%= variant.id %></option>
+            <% end %>
+          </select>
+        </div>
+        <div class='input-group'>
+          <label for='user_ids'>User IDs:</label>
+          <textarea name='user_ids' class='user_ids' placeholder="one user id per line" cols='50' rows='10'></textarea>
+        </div>
+        <div class='input-group'>
+          <input type="submit" value='Assign users' />
+        </div>
+      </form>
+    </div>
+
+    <div class='experiment-section'>
+      <h5 class='experiment-section-title'>Reset experiment</h5>
+      <form class='user-id-input-form' method='post' action="<%= reset_experiment_url(@experiment) %>">
+        <div class='input-group'>
+          <input type="submit" value='Reset Experiment' onclick="return confirm('Are you sure you want to reset this experiment?');" />
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

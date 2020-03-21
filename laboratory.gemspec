@@ -26,7 +26,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'redis', '>= 2.1'
+  spec.add_dependency 'sinatra', '>= 1.2.6'
 
+  spec.add_development_dependency 'rack-test',   '~> 1.1'
   spec.add_development_dependency 'rspec', '~> 3.8'
   spec.add_development_dependency 'fakeredis', '~> 0.8'
 end

@@ -18,7 +18,7 @@ Laboratory builds upon great work from other gems, in particular [Split](https:/
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'laboratory'
+gem 'laboratory', require: 'laboratory/ui'
 ```
 
 And then execute:
