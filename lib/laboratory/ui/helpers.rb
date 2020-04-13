@@ -9,19 +9,19 @@ module Laboratory
     end
 
     def experiment_url(experiment)
-      url('experiments', experiment.id, 'edit')
+      url('experiments', CGI.escape(experiment.id), 'edit')
     end
 
     def update_percentages_url(experiment)
-      url('experiments', experiment.id, 'update_percentages')
+      url('experiments', CGI.escape(experiment.id), 'update_percentages')
     end
 
     def assign_users_to_variant_url(experiment)
-      url('experiments', experiment.id, 'assign_users')
+      url('experiments', CGI.escape(experiment.id), 'assign_users')
     end
 
     def reset_experiment_url(experiment)
-      url('experiments', experiment.id, 'reset')
+      url('experiments', CGI.escape(experiment.id), 'reset')
     end
 
     def analysis_summary(experiment, event_id)
