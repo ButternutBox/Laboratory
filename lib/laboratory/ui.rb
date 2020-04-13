@@ -19,13 +19,13 @@ module Laboratory
     end
 
     get '/experiments/:id/edit' do
-      @experiment = Laboratory::Experiment.find(params[:id])
+      @experiment = Laboratory::Experiment.find(CGI.unescape(params[:id]))
       erb :edit
     end
 
     # params = {variants: { control => 40, variant_a => 60 }}
     post '/experiments/:id/update_percentages' do
-      experiment = Laboratory::Experiment.find(params[:id])
+      experiment = Laboratory::Experiment.find(CGI.unescape(params[:id]))
 
       params[:variants].each do |variant_id, percentage|
         variant = experiment.variants.find { |v| v.id == variant_id }
@@ -38,7 +38,7 @@ module Laboratory
 
     # params = {variant_id: 'control', user_ids: []}
     post '/experiments/:id/assign_users' do
-      experiment = Laboratory::Experiment.find(params[:id])
+      experiment = Laboratory::Experiment.find(CGI.unescape(params[:id]))
       variant = experiment.variants.find { |v| v.id == params[:variant_id] }
       user_ids = params[:user_ids].split("\r\n")
 
@@ -51,7 +51,7 @@ module Laboratory
     end
 
     post '/experiments/:id/reset' do
-      experiment = Laboratory::Experiment.find(params[:id])
+      experiment = Laboratory::Experiment.find(CGI.unescape(params[:id]))
       experiment.reset
       redirect experiment_url(experiment)
     end
