@@ -332,6 +332,30 @@ RSpec.describe Laboratory::Experiment do
         expect(outputs).to eq(expected_outputs)
       end
     end
+
+    context 'when the experiment is overridden' do
+      it 'returns the overridden variant' do
+        id = 1
+        variants = [
+          {
+            id: 'control',
+            percentage: 40
+          },
+          {
+            id: 'variant_a',
+            percentage: 60
+          }
+        ]
+        variant_to_override_with = 'variant_a'
+
+        experiment = described_class.create(id: id, variants: variants)
+        overrides = {}
+        overrides[experiment.id] = variant_to_override_with
+        described_class.override!(overrides)
+
+        expect(experiment.variant.id).to eq(variant_to_override_with)
+      end
+    end
   end
 
   describe '#assign_to_variant' do
