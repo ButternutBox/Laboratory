@@ -1,5 +1,20 @@
 module Laboratory
   class Experiment
+
+    class << self
+      def overrides
+        @overrides || {}
+      end
+
+      def override!(overrides)
+        @overrides = overrides
+      end
+
+      def clear_overrides!
+        @overrides = {}
+      end
+    end
+
     class UserNotInExperimentError < StandardError; end
     class ClashingExperimentIdError < StandardError; end
     class MissingExperimentIdError < StandardError; end
@@ -84,6 +99,8 @@ module Laboratory
     end
 
     def variant(user: Laboratory.config.current_user)
+      return variant_overridden_with if overridden?
+
       selected_variant = variants.find { |variant| variant.participant_ids.include?(user.id)}
       return selected_variant if !selected_variant.nil?
 
@@ -164,6 +181,14 @@ module Laboratory
     end
 
     private
+
+    def overridden?
+      self.class.overrides.key?(id) && variant_overridden_with != nil
+    end
+
+    def variant_overridden_with
+      variants.find { |v| v.id == self.class.overrides[id] }
+    end
 
     def changeset
       set = {}
