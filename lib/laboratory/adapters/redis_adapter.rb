@@ -1,23 +1,26 @@
 module Laboratory
   module Adapters
-    class RedisAdapter
+    class RedisAdapter # rubocop:disable Metrics/ClassLength
       attr_reader :redis
 
-      ALL_EXPERIMENTS_KEYS_KEY = 'SWITCH_ALL_EXPERIMENT_KEYS'.freeze
+      ALL_EXPERIMENTS_KEYS_KEY = 'LABORATORY_ALL_EXPERIMENT_KEYS'.freeze
 
       def initialize(url:)
         @redis = Redis.new(url: url)
-
-        if !redis.get(ALL_EXPERIMENTS_KEYS_KEY)
-          redis.set(ALL_EXPERIMENTS_KEYS_KEY, [])
-        end
       end
 
       def write(experiment)
-        redis.set(redis_key(experiment_id: experiment.id), experiment_to_json(experiment))
-        # Write to ALL_EXPERIMENTS_KEY_KEY if it isn't already there.
-        experiment_ids = JSON.parse(redis.get(ALL_EXPERIMENTS_KEYS_KEY))
-        experiment_ids << experiment.id unless experiment_ids.include?(experiment.id)
+        key = redis_key(experiment_id: experiment.id)
+        json = experiment_to_json(experiment)
+        redis.set(key, json)
+
+        # Write to ALL_EXPERIMENTS_KEYS_KEY if it isn't already there.
+        experiment_ids = fetch_all_experiment_ids
+
+        unless experiment_ids.include?(experiment.id)
+          experiment_ids << experiment.id
+        end
+
         redis.set(ALL_EXPERIMENTS_KEYS_KEY, experiment_ids.to_json)
       end
 
@@ -26,11 +29,12 @@ module Laboratory
         response = redis.get(key)
 
         return nil if response.nil?
+
         parse_json_to_experiment(JSON.parse(response))
       end
 
       def read_all
-        experiment_ids = JSON.parse(redis.get(ALL_EXPERIMENTS_KEYS_KEY))
+        experiment_ids = fetch_all_experiment_ids
         experiment_ids.map do |experiment_id|
           read(experiment_id)
         end
@@ -41,17 +45,26 @@ module Laboratory
         redis.del(key)
 
         # Remove from ALL_EXPERIMENTS_KEY_KEY
-        experiment_ids = JSON.parse(redis.get(ALL_EXPERIMENTS_KEYS_KEY))
+        experiment_ids = fetch_all_experiment_ids
         experiment_ids.delete(experiment_id)
         redis.set(ALL_EXPERIMENTS_KEYS_KEY, experiment_ids.to_json)
       end
 
       def delete_all
-        experiment_ids = JSON.parse(redis.get(ALL_EXPERIMENTS_KEYS_KEY))
+        experiment_ids = fetch_all_experiment_ids
         experiment_ids.each { |experiment_id| delete(experiment_id) }
       end
 
       private
+
+      def fetch_all_experiment_ids
+        response = redis.get(ALL_EXPERIMENTS_KEYS_KEY)
+        if response
+          JSON.parse(response)
+        else
+          []
+        end
+      end
 
       def redis_key(experiment_id:)
         "laboratory_#{experiment_id}"
@@ -79,9 +92,11 @@ module Laboratory
 
       def experiment_events_to_hash(events)
         events.map do |event|
+          event_recordings =
+            experiment_event_recordings_to_hash(event.event_recordings)
           {
             id: event.id,
-            event_recordings: experiment_event_recordings_to_hash(event.event_recordings)
+            event_recordings: event_recordings
           }
         end
       end
@@ -127,9 +142,13 @@ module Laboratory
 
       def parse_json_to_experiment_events(events_json)
         events_json.map do |json|
+          event_recordings = parse_json_to_experiment_event_recordings(
+            json['event_recordings']
+          )
+
           Experiment::Event.new(
             id: json['id'],
-            event_recordings: parse_json_to_experiment_event_recordings(json['event_recordings'])
+            event_recordings: event_recordings
           )
         end
       end

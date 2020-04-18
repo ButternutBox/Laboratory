@@ -1,7 +1,7 @@
 module Laboratory
   module UIHelpers
     def url(*path_parts)
-      [ path_prefix, path_parts ].join("/").squeeze('/')
+      [path_prefix, path_parts].join('/').squeeze('/')
     end
 
     def path_prefix
@@ -25,10 +25,15 @@ module Laboratory
     end
 
     def analysis_summary(experiment, event_id)
-      analysis = experiment.analysis_summary_for(event_id)
-      return if analysis.highest_performing_variant == analysis.lowest_performing_variant
+      return if experiment.variants.length < 2
 
-      "#{analysis.highest_performing_variant.id} is performing #{analysis.performance_delta_between_highest_and_lowest * 100}% better than #{analysis.lowest_performing_variant.id}. I'm #{analysis.confidence_level_in_performance_delta * 100}% certain of this."
+      analysis = experiment.analysis_summary_for(event_id)
+
+      "#{analysis.highest_performing_variant.id} is performing" \
+      " #{analysis.performance_delta_between_highest_and_lowest * 100}%" \
+      " better than #{analysis.lowest_performing_variant.id}. I'm" \
+      " #{analysis.confidence_level_in_performance_delta * 100}% certain of" \
+      ' this.'
     end
   end
 end

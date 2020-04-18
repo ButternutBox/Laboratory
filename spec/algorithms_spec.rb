@@ -2,7 +2,8 @@ RSpec.describe Laboratory::Algorithms do
   describe '#to_class' do
     context 'when a valid identifier is passed in' do
       it 'should return the associated class' do
-        expect(described_class.to_class(Laboratory::Algorithms::Random.id)).to eq(Laboratory::Algorithms::Random)
+        expect(described_class.to_class(Laboratory::Algorithms::Random.id))
+          .to eq(Laboratory::Algorithms::Random)
       end
     end
 

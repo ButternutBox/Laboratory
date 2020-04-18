@@ -1,6 +1,5 @@
 module Laboratory
-  class Experiment
-
+  class Experiment # rubocop:disable Metrics/ClassLength
     class << self
       def overrides
         @overrides || {}
@@ -30,7 +29,7 @@ module Laboratory
       :changelog
     )
 
-    def initialize(id:, variants:, algorithm: Algorithms::Random, changelog: [])
+    def initialize(id:, variants:, algorithm: Algorithms::Random, changelog: []) # rubocop:disable Metrics/MethodLength
       @id = id
       @algorithm = algorithm
       @changelog = changelog
@@ -39,7 +38,7 @@ module Laboratory
       # This also helps when decoding from adapters
 
       @variants =
-        if variants.all? { |variant| variant.instance_of?(Laboratory::Experiment::Variant) }
+        if variants.all? { |variant| variant.instance_of?(Experiment::Variant) }
           variants
         elsif variants.all? { |variant| variant.instance_of?(Hash) }
           variants.map do |variant|
@@ -98,11 +97,15 @@ module Laboratory
       save
     end
 
-    def variant(user: Laboratory.config.current_user)
+    def variant(user: Laboratory.config.current_user) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       return variant_overridden_with if overridden?
 
-      selected_variant = variants.find { |variant| variant.participant_ids.include?(user.id)}
-      return selected_variant if !selected_variant.nil?
+      selected_variant =
+        variants.find do |variant|
+          variant.participant_ids.include?(user.id)
+        end
+
+      return selected_variant unless selected_variant.nil?
 
       variant = algorithm.pick!(variants)
       variant.add_participant(user)
@@ -127,7 +130,7 @@ module Laboratory
       variant
     end
 
-    def record_event!(event_id, user: Laboratory.config.current_user)
+    def record_event!(event_id, user: Laboratory.config.current_user) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       variant = variants.find { |s| s.participant_ids.include?(user.id) }
       raise UserNotInExperimentError unless variant
 
@@ -156,6 +159,7 @@ module Laboratory
 
     def save
       raise errors.first unless valid?
+
       unless changeset.empty?
         changelog_item = Laboratory::Experiment::ChangelogItem.new(
           changes: changeset,
@@ -168,7 +172,7 @@ module Laboratory
       Laboratory.config.adapter.write(self)
     end
 
-    def valid?
+    def valid? # rubocop:disable Metrics/AbcSize
       valid_variants =
         variants.all? do |variant|
           !variant.id.nil? && !variant.percentage.nil?
@@ -183,21 +187,26 @@ module Laboratory
     private
 
     def overridden?
-      self.class.overrides.key?(id) && variant_overridden_with != nil
+      self.class.overrides.key?(id) && !variant_overridden_with.nil?
     end
 
     def variant_overridden_with
       variants.find { |v| v.id == self.class.overrides[id] }
     end
 
-    def changeset
+    def changeset # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       set = {}
       set[:id] = [_original_id, id] if _original_id != id
-      set[:algorithm] = [_original_algorithm, algorithm] if _original_algorithm != algorithm
 
-      variants_changeset = variants.map { |variant|
-        { variant.id => variant.changeset }
-      }
+      if _original_algorithm != algorithm
+        set[:algorithm] = [_original_algorithm, algorithm]
+      end
+
+      variants_changeset =
+        variants.map do |variant|
+          { variant.id => variant.changeset }
+        end
+
       variants_changeset.reject! do |change|
         change.values.all?(&:empty?)
       end
@@ -206,23 +215,25 @@ module Laboratory
       set
     end
 
-    def errors
+    def errors # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       errors = []
 
-      missing_variant_ids = variants.any? do |variant|
-        variant.id.nil?
-      end
+      missing_variant_ids =
+        variants.any? do |variant|
+          variant.id.nil?
+        end
 
-      missing_variant_percentages = variants.any? do |variant|
-        variant.percentage.nil?
-      end
+      missing_variant_percentages =
+        variants.any? do |variant|
+          variant.percentage.nil?
+        end
 
       incorrect_percentage_total = variants.map(&:percentage).sum != 100
 
       errors << MissingExperimentIdError if id.nil?
       errors << MissingExperimentAlgorithmError if algorithm.nil?
       errors << MissingExperimentVariantIdError if missing_variant_ids
-      errors << MissingExperimentVariantPercentageError if missing_variant_percentages
+      errors << MissingExperimentVariantPercentageError if missing_variant_percentages # rubocop:disable Layout/LineLength
       errors << IncorrectPercentageTotalError if incorrect_percentage_total
 
       errors

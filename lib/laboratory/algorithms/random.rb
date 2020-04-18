@@ -2,7 +2,7 @@ module Laboratory
   module Algorithms
     class Random
       def self.pick!(variants)
-        variants.sort_by { |variant| - variant.percentage * rand() }.first
+        variants.min_by { |variant| - variant.percentage * rand }
       end
 
       def self.id
