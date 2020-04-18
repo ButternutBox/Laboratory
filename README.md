@@ -138,6 +138,29 @@ experiment.record_event!('completed')
 
 Note the `#record_event!` method also takes an optional user parameter should you want to define the user specifically in this case. It defaults to a user with the current_user_id defined in the Laboratory configuration.
 
+### Temporarily overriding experiment variants
+
+Sometimes, when QA'ing or developing an experiment, you'll want to easily switch between variants without having to jump into the console. This can be managed via a url parameter by adding the following snippet to your application controller (this example is for Rails, but a similar approach would work for other frameworks):
+
+```ruby
+
+around_action :override_laboratory_experiments!
+
+def override_laboratory_experiments!
+  Laboratory::Experiment.override!(params[:exp])
+  yield
+  Laboratory::Experiment.clear_overrides!
+end
+```
+
+This then allows you navigate to a urls like:
+
+http://yourwebsite.com?exp[blue_button_ab_test]=variant_a
+
+and
+
+http://yourwebsite.com?exp[blue_button_ab_test]=control
+
 ### Using the Laboratory UI
 
 It's easy to analyse and manage your experiment from the dashboard. In routes.rb, mount the dashboard behind your appropriate authentication layer (this example uses Devise):
@@ -264,13 +287,8 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ### Todo List
 
-- [ ] Redefine the Experiment#inspect definition for cleaner debugging
-- [ ] Install Rubocop
-- [ ] Fixup to comply with Rubocop
-- [ ] Enforce parameter friendly experiment names
-- [ ] Enable assignment of variant temporarily via url
 - [ ] Test in a multi-threaded puma environment
-- [ ] Review dependencies and minimum versions required.
+- [ ] Test performance in a A/A test on production
 
 ## Contributing
 
