@@ -164,7 +164,7 @@ module Laboratory
         changelog_item = Laboratory::Experiment::ChangelogItem.new(
           changes: changeset,
           timestamp: Time.now,
-          actor: Laboratory::Config.actor
+          actor: Laboratory.config.actor
         )
 
         @changelog << changelog_item
