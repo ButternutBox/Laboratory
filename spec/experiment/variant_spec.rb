@@ -39,7 +39,11 @@ RSpec.describe Laboratory::Experiment::Variant do
     context 'when the participant_ids are specified' do
       it 'uses those participant_ids' do
         participant_ids = [1]
-        variant = described_class.new(id: 1, percentage: 50, participant_ids: participant_ids)
+        variant = described_class.new(
+          id: 1,
+          percentage: 50,
+          participant_ids: participant_ids
+        )
         expect(variant.participant_ids).to eq(participant_ids)
       end
     end
@@ -56,7 +60,7 @@ RSpec.describe Laboratory::Experiment::Variant do
   describe '#add_participant' do
     it 'adds the user\'s id to the participant_ids' do
       user = Laboratory::User.new(id: 1)
-      variant = variant = described_class.new(id: 1, percentage: 50)
+      variant = described_class.new(id: 1, percentage: 50)
 
       variant.add_participant(user)
 

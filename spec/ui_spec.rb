@@ -8,7 +8,7 @@ RSpec.describe Laboratory::UI do
     @app ||= described_class
   end
 
-  it "should respond to /" do
+  it 'should respond to /' do
     get '/'
     expect(last_response).to be_ok
   end

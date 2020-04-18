@@ -99,7 +99,11 @@ RSpec.describe Laboratory::Experiment do
             percentage: 60
           }
         ]
-        experiment = described_class.new(id: 1, variants: variants, algorithm: algorithm)
+        experiment = described_class.new(
+          id: 1,
+          variants: variants,
+          algorithm: algorithm
+        )
         expect(experiment.algorithm).to eq(algorithm)
       end
     end
@@ -107,17 +111,20 @@ RSpec.describe Laboratory::Experiment do
 
   describe '#create' do
     it 'returns an experiment' do
-      experiment = described_class.create(id: 1, variants: [{ id: 'control', percentage: 100 }])
+      variants = [{ id: 'control', percentage: 100 }]
+      experiment = described_class.create(id: 1, variants: variants)
       expect(experiment).to be_instance_of(described_class)
     end
 
     it 'uses the Algorithms::Random if an algortihm is not specified' do
-      experiment = described_class.create(id: 1, variants: [{ id: 'control', percentage: 100 }])
+      variants = [{ id: 'control', percentage: 100 }]
+      experiment = described_class.create(id: 1, variants: variants)
       expect(experiment.algorithm).to eq(Laboratory::Algorithms::Random)
     end
 
     it 'writes the experiment to the storage adapter' do
-      experiment = described_class.create(id: 1, variants: [{ id: 'control', percentage: 100 }])
+      variants = [{ id: 'control', percentage: 100 }]
+      experiment = described_class.create(id: 1, variants: variants)
       expect(described_class.find(experiment.id)).to_not eq nil
     end
 
@@ -136,7 +143,8 @@ RSpec.describe Laboratory::Experiment do
 
         experiment = described_class.create(id: 1, variants: variants)
 
-        expect(experiment.variants).to all(be_instance_of Laboratory::Experiment::Variant)
+        expect(experiment.variants)
+          .to all(be_instance_of Laboratory::Experiment::Variant)
         expect(experiment.variants.first.id).to eq('control')
         expect(experiment.variants.first.percentage).to eq(40)
         expect(experiment.variants[1].id).to eq('variant_a')
@@ -144,7 +152,7 @@ RSpec.describe Laboratory::Experiment do
       end
     end
 
-    it 'raises an error if there is a preexisting experiment with the same id' do
+    it 'raises an error if there is a preexisting experiment with the same id' do # rubocop:disable Layout/LineLength
       id = 1
       variants = [
         {
@@ -158,7 +166,8 @@ RSpec.describe Laboratory::Experiment do
       ]
       described_class.create(id: id, variants: variants)
 
-      expect { described_class.create(id: id, variants: variants) }.to raise_error(Laboratory::Experiment::ClashingExperimentIdError)
+      expect { described_class.create(id: id, variants: variants) }
+        .to raise_error(Laboratory::Experiment::ClashingExperimentIdError)
     end
   end
 
@@ -187,7 +196,7 @@ RSpec.describe Laboratory::Experiment do
     end
 
     context 'when the experiment does not exist' do
-      it 'returns nil'do
+      it 'returns nil' do
         expect(described_class.find('none')).to eq(nil)
       end
     end
@@ -221,7 +230,9 @@ RSpec.describe Laboratory::Experiment do
           }
         ]
 
-        fetched_experiment = described_class.find_or_create(id: id, variants: different_variants)
+        fetched_experiment = described_class.find_or_create(
+          id: id, variants: different_variants
+        )
 
         expect(fetched_experiment.id).to eq(experiment.id)
         expect(fetched_experiment.variants).to match(experiment.variants)
@@ -243,7 +254,7 @@ RSpec.describe Laboratory::Experiment do
         ]
 
         expect(described_class.find(id)).to eq(nil)
-        experiment = described_class.find_or_create(id: id, variants: variants)
+        described_class.find_or_create(id: id, variants: variants)
         expect(described_class.find(id)).not_to eq(nil)
       end
     end
@@ -251,7 +262,8 @@ RSpec.describe Laboratory::Experiment do
 
   describe '#delete' do
     it 'deletes the experiment from the stoage adapter' do
-      experiment = described_class.create(id: 1, variants: [{ id: 'control', percentage: 100 }])
+      variants = [{ id: 'control', percentage: 100 }]
+      experiment = described_class.create(id: 1, variants: variants)
       experiment.delete
       expect(described_class.find(experiment.id)).to be nil
     end
@@ -259,7 +271,8 @@ RSpec.describe Laboratory::Experiment do
 
   describe '#reset' do
     it 'resets the participant_ids for all variants' do
-      experiment = described_class.create(id: 1, variants: [{ id: 'control', percentage: 100 }])
+      variants = [{ id: 'control', percentage: 100 }]
+      experiment = described_class.create(id: 1, variants: variants)
       user = Laboratory::User.new(id: 1)
       experiment.assign_to_variant(experiment.variants.first.id, user: user)
 
@@ -269,7 +282,8 @@ RSpec.describe Laboratory::Experiment do
     end
 
     it 'resets the events for all variants' do
-      experiment = described_class.create(id: 1, variants: [{ id: 'control', percentage: 100 }])
+      variants = [{ id: 'control', percentage: 100 }]
+      experiment = described_class.create(id: 1, variants: variants)
       user = Laboratory::User.new(id: 1)
       experiment.assign_to_variant(experiment.variants.first.id, user: user)
 
@@ -420,7 +434,8 @@ RSpec.describe Laboratory::Experiment do
         experiment = described_class.new(id: id, variants: variants)
         user = Laboratory::User.new(id: 1)
 
-        expect { experiment.record_event!('completed', user: user) }.to raise_error(Laboratory::Experiment::UserNotInExperimentError)
+        expect { experiment.record_event!('completed', user: user) }
+          .to raise_error(Laboratory::Experiment::UserNotInExperimentError)
       end
     end
 
@@ -442,7 +457,8 @@ RSpec.describe Laboratory::Experiment do
       experiment.assign_to_variant('control', user: user)
 
       recording = experiment.record_event!('completed', user: user)
-      expect(recording).to be_instance_of(Laboratory::Experiment::Event::Recording)
+      expect(recording)
+        .to be_instance_of(Laboratory::Experiment::Event::Recording)
     end
   end
 
@@ -513,7 +529,11 @@ RSpec.describe Laboratory::Experiment do
             percentage: 60
           }
         ]
-        experiment = described_class.new(id: 1, variants: variants, algorithm: nil)
+        experiment = described_class.new(
+          id: 1,
+          variants: variants,
+          algorithm: nil
+        )
         expect(experiment.valid?).to be false
       end
     end

@@ -17,8 +17,9 @@ module Laboratory
       end
 
       def performance_delta_between_highest_and_lowest
-        numerator = (conversion_rate_for_variant(highest_performing_variant) -
-          conversion_rate_for_variant(lowest_performing_variant))
+        numerator =
+          (conversion_rate_for_variant(highest_performing_variant) -
+            conversion_rate_for_variant(lowest_performing_variant))
         denominator = conversion_rate_for_variant(lowest_performing_variant)
         numerator.fdiv(denominator).round(2)
       end
@@ -57,9 +58,10 @@ module Laboratory
       end
 
       def sorted_variants
-        relevant_variants.sort_by { |variant|
-          conversion_rate_for_variant(variant)
-        }.reverse
+        relevant_variants.sort_by do |variant|
+          # Order in descending order
+          -1 * conversion_rate_for_variant(variant)
+        end
       end
 
       def event_for_variant(variant)

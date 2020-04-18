@@ -26,7 +26,11 @@ module Laboratory
       def changeset
         set = {}
         set[:id] = [_original_id, id] if _original_id != id
-        set[:percentage] = [_original_percentage, percentage] if _original_percentage != percentage
+
+        if _original_percentage != percentage
+          set[:percentage] = [_original_percentage, percentage]
+        end
+
         set
       end
     end

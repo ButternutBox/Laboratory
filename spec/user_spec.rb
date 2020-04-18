@@ -80,7 +80,8 @@ RSpec.describe Laboratory::User do
 
         experiment.assign_to_variant(experiment.variants.first.id, user: user)
 
-        expect(user.variant_for_experiment(experiment)).to eq(experiment.variants.first)
+        expect(user.variant_for_experiment(experiment))
+          .to eq(experiment.variants.first)
       end
     end
   end
