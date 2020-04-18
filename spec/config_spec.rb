@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 RSpec.describe Laboratory::Config do
-  it 'should have an attr_accessor called adapter' do
-    expect(described_class.new).to have_attr_accessor(:adapter)
-  end
-
   it 'should have an attr_accessor called current_user_id' do
     expect(described_class.new).to have_attr_accessor(:current_user_id)
   end
