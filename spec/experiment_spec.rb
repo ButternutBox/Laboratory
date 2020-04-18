@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-Laboratory.config.adapter = Laboratory::Adapters::MockAdapter.new
+Laboratory.adapter = Laboratory::Adapters::MockAdapter.new
 
 RSpec.describe Laboratory::Experiment do
   before(:each) do
-    Laboratory.config.adapter.delete_all
+    Laboratory.adapter.delete_all
   end
 
   it 'should have an attr_reader called id' do
@@ -477,7 +477,7 @@ RSpec.describe Laboratory::Experiment do
       ]
 
       experiment = described_class.new(id: id, variants: variants)
-      expect(Laboratory.config.adapter).to receive(:write).with(experiment)
+      expect(Laboratory.adapter).to receive(:write).with(experiment)
       experiment.save
     end
   end

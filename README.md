@@ -49,7 +49,7 @@ Or install it yourself as:
 In an initializer (`app/config/initializers/laboratory.rb`), define the adapter you are going to use with Laboratory. Laboratory supports Redis out of the box, as it the recommended adapter:
 
 ```ruby
-Laboratory.config.adapter = Laboratory::Adapters::RedisAdapter.new(url: 'redis://localhost:6789') # Adjust to your redis URL.
+Laboratory.adapter = Laboratory::Adapters::RedisAdapter.new(url: 'redis://localhost:6789') # Adjust to your redis URL.
 ```
 
 ### Defining your current_user_id & actor

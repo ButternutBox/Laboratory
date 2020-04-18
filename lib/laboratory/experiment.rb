@@ -56,7 +56,7 @@ module Laboratory
     end
 
     def self.all
-      Laboratory.config.adapter.read_all
+      Laboratory.adapter.read_all
     end
 
     def self.create(id:, variants:, algorithm: Algorithms::Random)
@@ -73,7 +73,7 @@ module Laboratory
     end
 
     def self.find(id)
-      Laboratory.config.adapter.read(id)
+      Laboratory.adapter.read(id)
     end
 
     def self.find_or_create(id:, variants:, algorithm: Algorithms::Random)
@@ -81,7 +81,7 @@ module Laboratory
     end
 
     def delete
-      Laboratory.config.adapter.delete(id)
+      Laboratory.adapter.delete(id)
       nil
     end
 
@@ -169,7 +169,7 @@ module Laboratory
 
         @changelog << changelog_item
       end
-      Laboratory.config.adapter.write(self)
+      Laboratory.adapter.write(self)
     end
 
     def valid? # rubocop:disable Metrics/AbcSize
