@@ -17,7 +17,7 @@ require 'laboratory/calculations/confidence_level'
 module Laboratory
   class << self
     def config
-      Laboratory::Config
+      Thread.current[:laboratory_config] ||= Laboratory::Config.new
     end
   end
 end

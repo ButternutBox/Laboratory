@@ -110,7 +110,7 @@ module Laboratory
       variant = algorithm.pick!(variants)
       variant.add_participant(user)
 
-      Laboratory::Config.on_assignment_to_variant&.call(self, variant, user)
+      Laboratory.config.on_assignment_to_variant&.call(self, variant, user)
 
       save
       variant
@@ -124,7 +124,7 @@ module Laboratory
       variant = variants.find { |s| s.id == variant_id }
       variant.add_participant(user)
 
-      Laboratory::Config.on_assignment_to_variant&.call(self, variant, user)
+      Laboratory.config.on_assignment_to_variant&.call(self, variant, user)
 
       save
       variant
@@ -147,7 +147,7 @@ module Laboratory
 
       event.event_recordings << event_recording
 
-      Laboratory::Config.on_event_recorded&.call(self, variant, user, event)
+      Laboratory.config.on_event_recorded&.call(self, variant, user, event)
 
       save
       event_recording
