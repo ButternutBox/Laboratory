@@ -287,8 +287,8 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ### Todo List
 
-- [ ] Test in a multi-threaded puma environment
-- [ ] Test performance in a A/A test on production
+- [ ] Test performance in an A/A test on production
+- [ ] Use for an A/B test on production
 
 ## Contributing
 
