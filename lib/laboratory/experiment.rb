@@ -2,15 +2,15 @@ module Laboratory
   class Experiment # rubocop:disable Metrics/ClassLength
     class << self
       def overrides
-        @overrides || {}
+        Thread.current[:experiment_overrides] || {}
       end
 
       def override!(overrides)
-        @overrides = overrides
+        Thread.current[:experiment_overrides] = overrides
       end
 
       def clear_overrides!
-        @overrides = {}
+        Thread.current[:experiment_overrides] = {}
       end
     end
 

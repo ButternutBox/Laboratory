@@ -67,6 +67,77 @@ RSpec.describe Laboratory::Experiment do
     expect(experiment).to have_attr_reader(:changelog)
   end
 
+  describe '#overrides' do
+    it 'returns the stored overrides' do
+      overrides = { a: 1 }
+      described_class.override!(overrides)
+      expect(described_class.overrides).to eq(overrides)
+    end
+
+    it 'is threadsafe' do
+      overrides = { a: 1 }
+      Thread.new do
+        described_class.override!(overrides)
+      end
+      Thread.new do
+        expect(described_class.overrides).to eq({})
+      end
+    end
+  end
+
+  describe '#override!' do
+    it 'sets the provided overrides' do
+      overrides = { a: 1 }
+      described_class.override!(overrides)
+      expect(described_class.overrides).to eq(overrides)
+    end
+
+    it 'is threadsafe' do
+      overrides = { a: 1 }
+      Thread.new do
+        described_class.override!(overrides)
+      end
+      Thread.new do
+        expect(described_class.overrides).to eq({})
+      end
+    end
+  end
+
+  describe '#clear_overrides!' do
+    it 'clears the overrides' do
+      overrides = { a: 1 }
+      described_class.override!(overrides)
+      described_class.clear_overrides!
+      expect(described_class.overrides).to eq({})
+    end
+
+    it 'is threadsafe' do
+      overrides = { a: 1 }
+      thread1 = Thread.new do
+        described_class.override!(overrides)
+        Thread.stop
+        described_class.clear_overrides!
+        expect(described_class.overrides).to eq({})
+      end
+
+      thread2 = Thread.new do
+        described_class.override!(overrides)
+        Thread.stop
+        # Ensure overrides maintain even after thread1 has called
+        # clear_overrides!
+        expect(described_class.overrides).to eq(overrides)
+      end
+
+      sleep 0.1 while thread1.status != 'sleep' && thread2.status != 'sleep'
+
+      thread1.run
+      thread2.run
+
+      thread1.join
+      thread2.join
+    end
+  end
+
   describe '#initialize' do
     context 'when the id is specified' do
       it 'uses that id' do
