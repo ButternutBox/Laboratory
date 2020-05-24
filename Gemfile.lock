@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    laboratory (0.1.6)
+    laboratory (0.1.7)
       redis (>= 2.1)
       sinatra (>= 1.2.6)
 
