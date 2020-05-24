@@ -41,7 +41,7 @@ module Laboratory
 
       def event_total_count_for_variant(variant)
         event = event_for_variant(variant)
-        event.event_recordings.count
+        event.event_recordings.uniq(&:user_id).count
       end
 
       def conversion_rate_for_variant(variant)
